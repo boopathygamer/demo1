@@ -1,0 +1,101 @@
+let gameBoard = document.getElementById('game-board');
+let snake = [];
+let food = null;
+let direction = 'right';
+let score = 0;
+
+// Initialize game board
+for (let i = 0; i < 20; i++) {
+  for (let j = 0; j < 20; j++) {
+    let cell = document.createElement('div');
+    cell.className = 'cell';
+    gameBoard.appendChild(cell);
+  }
+}
+
+// Set initial snake position
+snake.push({ x: 10, y: 10 });
+snake.push({ x: 11, y: 10 });
+snake.push({ x: 12, y: 10 });
+
+// Draw snake
+function drawSnake() {
+  for (let i = 0; i < snake.length; i++) {
+    let cell = gameBoard.children[snake[i].x + snake[i].y * 20];
+    cell.style.backgroundColor = 'green';
+  }
+}
+
+// Generate food
+function generateFood() {
+  let x = Math.floor(Math.random() * 20);
+  let y = Math.floor(Math.random() * 20);
+  food = { x, y };
+  let foodCell = gameBoard.children[food.x + food.y * 20];
+  foodCell.style.backgroundColor = 'red';
+}
+
+// Update game state
+function updateGameState() {
+  // Move snake
+  let newX = snake[0].x;
+  let newY = snake[0].y;
+  switch (direction) {
+    case 'right':
+      newX++;
+      break;
+    case 'left':
+      newX--;
+      break;
+    case 'up':
+      newY--;
+      break;
+    case 'down':
+      newY++;
+      break;
+  }
+  snake.unshift({ x: newX, y: newY });
+
+  // Check for collision with wall or self
+  if (newX < 0 || newX >= 20 || newY < 0 || newY >= 20 || snake.includes({ x: newX, y: newY })) {
+    alert('Game Over!');
+    return;
+  }
+
+  // Check for food
+  if (newX === food.x && newY === food.y) {
+    score++;
+    generateFood();
+  } else {
+    snake.pop();
+  }
+
+  // Draw snake and food
+  drawSnake();
+  if (food) {
+    let foodCell = gameBoard.children[food.x + food.y * 20];
+    foodCell.style.backgroundColor = 'red';
+  }
+}
+
+// Handle keyboard input
+document.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case 'ArrowRight':
+      direction = 'right';
+      break;
+    case 'ArrowLeft':
+      direction = 'left';
+      break;
+    case 'ArrowUp':
+      direction = 'up';
+      break;
+    case 'ArrowDown':
+      direction = 'down';
+      break;
+  }
+});
+
+// Start game
+generateFood();
+setInterval(updateGameState, 100);
